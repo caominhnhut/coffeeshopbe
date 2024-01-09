@@ -50,6 +50,7 @@ public class WebSecurityConfig{
             "/categories",
             "/products",
             "/products/**",
+            "/no-auth/**"
     };
 
     @Bean

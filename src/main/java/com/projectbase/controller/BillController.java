@@ -1,8 +1,15 @@
 package com.projectbase.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,5 +46,25 @@ public class BillController{
         String categoryId = billService.generate(bill);
 
         return ResponseEntity.ok(ResponseDto.response(categoryId));
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping
+    public ResponseEntity<ResponseDto<List<BillDto>>> findAllBills() {
+
+        List<BillDto> bills = billService.findAll().stream().map(billMapper::fromModel).collect(Collectors.toList());
+
+        return ResponseEntity.ok(ResponseDto.response(bills));
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/{uuid}")
+    public ResponseEntity downloadPDF(@PathVariable("uuid") String uuid) {
+
+        byte[] fileContent = billService.downloadReport(uuid);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + uuid + "\".pdf")
+                .body(new ByteArrayResource(fileContent));
     }
 }

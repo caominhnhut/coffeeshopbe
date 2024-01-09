@@ -4,9 +4,14 @@ import static com.projectbase.factory.Utility.STORED_REPORTS_LOCATION;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +36,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.projectbase.config.security.JwtRequestFilter;
 import com.projectbase.entity.BillEntity;
 import com.projectbase.entity.DetailedBill;
+import com.projectbase.exception.ApplicationException;
 import com.projectbase.factory.PdfSession;
 import com.projectbase.mapper.BillMapper;
 import com.projectbase.model.Bill;
@@ -63,6 +69,22 @@ public class BillServiceImpl implements BillService{
         generatePdf(bill);
 
         return fileName;
+    }
+
+    @Override
+    public List<Bill> findAll(){
+        return billRepository.findAll().stream().map(billMapper::fromEntity).collect(Collectors.toList());
+    }
+
+    @Override
+    public byte[] downloadReport(String uuid){
+        String fileName = STORED_REPORTS_LOCATION+"/"+uuid+".pdf";
+        try{
+            return Files.readAllBytes(Paths.get(fileName));
+        }catch(IOException e){
+            e.printStackTrace();
+            throw new ApplicationException("Cannot download the report: "+e.getMessage());
+        }
     }
 
     private void generatePdf(Bill bill){
