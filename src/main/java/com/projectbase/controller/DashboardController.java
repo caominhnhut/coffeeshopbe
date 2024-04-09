@@ -9,12 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projectbase.dto.ResponseDto;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping(value ="/dashboards")
+@Slf4j
 public class DashboardController{
 
     @GetMapping
     public ResponseEntity<ResponseDto<Map<String, Integer>>> getAll() {
-        return ResponseEntity.ok(ResponseDto.response(Map.of("product",1, "bill",2, "category",3)));
+        log.info("Processing for dashboard");
+        return ResponseEntity.ok(ResponseDto.response(Map.of()));
     }
 }
