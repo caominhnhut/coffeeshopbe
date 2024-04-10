@@ -21,4 +21,9 @@ pipeline {
             }
         }
     }
+    post {
+        always {
+            mail bcc: '', body: 'Nhut.Nguyen is testing for deployment with Jenkins', cc: 'nguyencaominhnhut@gmail.com', from: '', replyTo: '', subject: 'Coffeeshop Backend Deployment', to: 'huynhtuongvi.cntt@gmail.com'
+        }
+    }
 }
